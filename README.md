@@ -1,4 +1,4 @@
-# 犬太朗 (kentaro-animation)
+# 犬太朗 (inutarou-animation)
 
 オリジナル短編2Dアニメ『犬太朗』の制作リポジトリ。
 
