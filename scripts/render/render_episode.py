@@ -32,11 +32,35 @@ def render_shot(episode: str, shot: str, percent: int = 100) -> Path:
 
 def placeholder(path: Path, cut: timeline.Cut, ep: timeline.Episode, percent: int) -> None:
     width, height = round(ep.width * percent / 100), round(ep.height * percent / 100)
-    label = cut.id.replace("'", "").replace(":", "")
-    run("ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i",
-        f"color=c=black:s={width}x{height}:r={ep.fps}", "-f", "lavfi", "-i",
-        "anullsrc=r=48000:cl=stereo", "-vf",
-        f"drawtext=text='{label} (TEMP placeholder)':fontcolor=white:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2",
+    # ffmpeg builds without drawtext are common; draw a tiny bitmap label ourselves.
+    font = {
+        "0": ("111", "101", "101", "101", "111"), "1": ("010", "110", "010", "010", "111"),
+        "2": ("111", "001", "111", "100", "111"), "3": ("111", "001", "111", "001", "111"),
+        "4": ("101", "101", "111", "001", "001"), "5": ("111", "100", "111", "001", "111"),
+        "6": ("111", "100", "111", "101", "111"), "7": ("111", "001", "001", "001", "001"),
+        "8": ("111", "101", "111", "101", "111"), "9": ("111", "101", "111", "001", "111"),
+        "s": ("111", "100", "111", "001", "111"), "c": ("111", "100", "100", "100", "111"),
+        "_": ("000", "000", "000", "000", "111"),
+    }
+    label = cut.id.lower()
+    scale = max(2, min(width // max(1, len(label) * 5), height // 12, 12))
+    pixels = bytearray(width * height * 3)
+    x0 = max(0, (width - len(label) * 4 * scale) // 2)
+    y0 = max(0, (height - 5 * scale) // 2)
+    for index, char in enumerate(label):
+        for row, bits in enumerate(font.get(char, ("111", "101", "101", "101", "111"))):
+            for col, bit in enumerate(bits):
+                if bit == "1":
+                    for dy in range(scale):
+                        for dx in range(scale):
+                            x, y = x0 + (index * 4 + col) * scale + dx, y0 + row * scale + dy
+                            if 0 <= x < width and 0 <= y < height:
+                                offset = (y * width + x) * 3
+                                pixels[offset:offset + 3] = b"\xff\xff\xff"
+    image = path.with_suffix(".ppm")
+    image.write_bytes(f"P6\n{width} {height}\n255\n".encode() + pixels)
+    run("ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", str(ep.fps),
+        "-i", image, "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo",
         "-frames:v", str(cut.frames), "-t", str(cut.frames / ep.fps),
         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(path))
 
