@@ -150,6 +150,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--episode", default="episode01")
     ap.add_argument("--shot", default=None, help="このショットの範囲だけ（省略で話全体）")
+    ap.add_argument("--narration-rate", type=int, help="仮ナレーションの速度を比較する場合の上書き値")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
@@ -166,7 +167,8 @@ def main() -> None:
         if q.audio:
             src, kind = read_wav(ROOT / q.audio), "file"
         elif q.kind == "line":
-            src, kind = say(q.text, q.voice, q.rate), "temp_say"
+            rate = args.narration_rate if q.speaker == "narration" and args.narration_rate else q.rate
+            src, kind = say(q.text, q.voice, rate), "temp_say"
         elif q.name in SFX:
             src, kind = SFX[q.name](), "temp_synth"
         else:
