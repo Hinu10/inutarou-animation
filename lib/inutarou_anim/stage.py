@@ -30,8 +30,13 @@ def load_design(name: str):
 
 
 def load_module(path: Path, name: str):
+    """ファイルからモジュールを読み込む（同じ name は使い回す。dataclass のため sys.modules に登録）。"""
+    import sys
+    if name in sys.modules and getattr(sys.modules[name], "__file__", None) == str(path):
+        return sys.modules[name]
     spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
 

@@ -17,46 +17,11 @@ import random
 
 from inutarou_anim import effects as ef
 from inutarou_anim import stage
-from inutarou_anim.rig import Pose, Rig, solve_two_bone
+from inutarou_anim.actor import Actor, P, merge
+from inutarou_anim.rig import Pose, Rig
 from inutarou_anim.shapes import Shape, compose, dent_warp, inflate_warp, rect, transform
 
 CUTS = ["s6c05", "s6c06", "s6c07", "s6c08", "s6c09"]
-
-
-def P(**kw) -> dict[str, Pose]:
-    """Pose(loc, rot, scale) の短縮。P(head=(rot,), arm_L=dict(rot=-120))"""
-    out = {}
-    for bone, v in kw.items():
-        out[bone] = v if isinstance(v, Pose) else Pose(**v)
-    return out
-
-
-def merge(*poses: dict[str, Pose]) -> dict[str, Pose]:
-    out: dict[str, Pose] = {}
-    for p in poses:
-        out.update(p)
-    return out
-
-
-class Actor:
-    """全ボーンをまとめてキーする（指定のないボーンは休み姿勢）。"""
-
-    def __init__(self, rig: Rig, base: dict[str, Pose]):
-        self.rig = rig
-        self.base = base
-        self.bones = [b.name for b in rig.design.BONES]
-
-    def full(self, pose: dict[str, Pose]) -> dict[str, Pose]:
-        p = {b: Pose() for b in self.bones}
-        p.update(self.base)
-        p.update(pose)
-        return p
-
-    def key(self, frame: int, pose: dict[str, Pose], interp: str | None = None,
-            ease: str | None = None) -> dict[str, Pose]:
-        full = self.full(pose)
-        self.rig.key_pose(frame, full, interp, ease)
-        return full
 
 
 def build(ctx) -> dict:
@@ -70,6 +35,9 @@ def build(ctx) -> dict:
     bgfx = stage.FX(col, name="bg_fx", depth=5.0)       # 背景の上・キャラの後ろ
     fx = stage.FX(col, name="fx", depth=-2.0)          # キャラの前
     flash = stage.FX(col, name="flash", depth=-4.0)
+    # 机の上（カラスが持ち去ったポテチのかけら。SCENE 2 からのつながり）
+    dx, dy = room.SPOTS["desk_top"]
+    bgfx.draw("desk_items", 1, ctx.props("items").crumbs(dx + 0.1, dy + 0.13, n=6, seed=3))
 
     # ---------------------------------------------------------------- キャラクター
     inu_d = ctx.design("inutarou")

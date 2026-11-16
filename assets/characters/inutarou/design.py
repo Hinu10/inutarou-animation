@@ -113,6 +113,29 @@ def _brow(side, raised=False):
     return [Shape(ellipse(x, y, 0.1, 0.06, rot=0.25 * side), fill="dog_fur_dark", line=None)]
 
 
+def _brow_angry(side):
+    """怒り眉（内側が下がる）。"""
+    return [Shape(ellipse(0.36 * side, 2.5, 0.15, 0.055, rot=0.6 * side), fill="dog_fur_dark",
+                  line=None)]
+
+
+def _eye_angry(side):
+    """怒った目（内側が下がったまぶたで上が切れる）。"""
+    x = 0.38 * side
+    lower = ellipse(x, 2.23, 0.13, 0.15, n=24, start=3.3, end=6.12)
+    lid = [(x + 0.2 * side, 2.33), (x - 0.18 * side, 2.2)]
+    return [Shape(lower + [(x - 0.12 * side, 2.24)], fill="black", line="black", width=0.02),
+            Shape(lid, line="line", width=0.07, closed=False, taper=0.6)]
+
+
+def _eye_wide(side):
+    """驚き・あわて（白目に小さい黒目）。"""
+    x = 0.38 * side
+    return [Shape(ellipse(x, 2.26, 0.17, 0.2), fill="white", line="black", width=0.04),
+            Shape(ellipse(x, 2.24, 0.07, 0.09), fill="black", line=None),
+            Shape(ellipse(x - 0.02, 2.27, 0.025, 0.025), fill="white", line=None)]
+
+
 def _mouth_default():
     return [Shape(curve([(0, 1.88), (0, 1.8)]), width=0.035, closed=False),
             Shape(curve([(-0.26, 1.8), (-0.13, 1.7), (0, 1.8)]), width=0.035, closed=False, taper=0.5),
@@ -131,6 +154,30 @@ def _mouth_open():
     return [Shape(curve([(0, 1.88), (0, 1.8)]), width=0.035, closed=False),
             Shape(m, fill="dog_mouth", width=0.035),
             Shape(ellipse(0, 1.64, 0.09, 0.05), fill="dog_tongue", line=None)]
+
+
+def _mouth_talk():
+    """しゃべる口（小さく開く）。"""
+    m = blob([(-0.16, 1.8), (0, 1.77), (0.16, 1.8), (0.09, 1.67), (-0.09, 1.67)], samples=6)
+    return [Shape(curve([(0, 1.88), (0, 1.8)]), width=0.035, closed=False),
+            Shape(m, fill="dog_mouth", width=0.035)]
+
+
+def _mouth_shout():
+    """怒鳴る口（大きく開いて牙が見える）。"""
+    m = blob([(-0.3, 1.82), (0, 1.78), (0.3, 1.82), (0.22, 1.5), (0, 1.44), (-0.22, 1.5)], samples=6)
+    return [Shape(curve([(0, 1.88), (0, 1.81)]), width=0.035, closed=False),
+            Shape(m, fill="dog_mouth", width=0.04),
+            Shape([(-0.2, 1.79), (-0.15, 1.69), (-0.1, 1.79)], fill="white", width=0.02),
+            Shape([(0.1, 1.79), (0.15, 1.69), (0.2, 1.79)], fill="white", width=0.02),
+            Shape(ellipse(0, 1.52, 0.13, 0.06), fill="dog_tongue", line=None)]
+
+
+def _mouth_pout():
+    """ぼやく口（への字）。"""
+    return [Shape(curve([(0, 1.88), (0, 1.8)]), width=0.035, closed=False),
+            Shape(curve([(-0.22, 1.7), (-0.1, 1.77), (0.05, 1.74), (0.22, 1.68)]), width=0.04,
+                  closed=False, taper=0.6)]
 
 
 def _mouth_ouch():
@@ -184,6 +231,28 @@ def _paw_thumb(side):
             Shape(curve([(x - 0.17 * side, 0.37), (x + 0.02 * side, 0.37)]), width=0.025, closed=False)]
 
 
+def _paw_point(side):
+    """指さしの手（1本指を腕の向きに伸ばす）。"""
+    x = 0.8 * side
+    d = (0.275 * side, -0.96)   # 休み姿勢での腕の向き
+    tip = (x + d[0] * 0.3, 0.42 + d[1] * 0.3)
+    return [Shape(capsule((x, 0.42), tip, 0.085), fill="dog_white", width=0.045),
+            Shape(ellipse(x - 0.03 * side, 0.47, 0.17, 0.15), fill="dog_white", width=W),
+            Shape(curve([(x - 0.1 * side, 0.36), (x - 0.12 * side, 0.46)]), width=0.025, closed=False)]
+
+
+def _controller():
+    """ゲームのコントローラー（両手で持つ。body に付く）。"""
+    body = blob([(-0.46, 0.62), (0, 0.66), (0.46, 0.62), (0.52, 0.42), (0.36, 0.3), (0.15, 0.42),
+                 (-0.15, 0.42), (-0.36, 0.3), (-0.52, 0.42)], samples=6)
+    out = [Shape(body, fill="controller", width=0.045),
+           Shape(rect(-0.25, 0.52, 0.14, 0.045), fill="controller_btn", line=None),
+           Shape(rect(-0.25, 0.52, 0.045, 0.14), fill="controller_btn", line=None)]
+    for (bx, by, c) in ((0.2, 0.55, "red"), (0.29, 0.5, "yellow"), (0.2, 0.47, "card_blue")):
+        out.append(Shape(ellipse(bx, by, 0.035, 0.035), fill=c, line=None))
+    return out
+
+
 def _card():
     """海斗のクレジットカード（小道具）。"""
     c = rect(0, 0, 0.5, 0.32, r=0.04)
@@ -212,23 +281,37 @@ PARTS = [
     Part("cheek_R", "cheek_R", {"default": lambda: _cheek(1)}),
     Part("muzzle", "mouth", {"default": _muzzle}),
     Part("mouth", "mouth", {"default": _mouth_default, "smug": _mouth_smug, "open": _mouth_open,
-                            "ouch": _mouth_ouch}),
+                            "ouch": _mouth_ouch, "talk": _mouth_talk, "shout": _mouth_shout,
+                            "pout": _mouth_pout}),
     Part("nose", "mouth", {"default": _nose}),
     Part("eye_L", "eye_L", {"default": lambda: _eye_open(-1), "smug": lambda: _eye_smug(-1),
                             "closed": lambda: _eye_closed(-1), "squeeze": lambda: _eye_squeeze(-1),
-                            "spark": lambda: _eye_open(-1, True)}),
+                            "spark": lambda: _eye_open(-1, True), "angry": lambda: _eye_angry(-1),
+                            "wide": lambda: _eye_wide(-1)}),
     Part("eye_R", "eye_R", {"default": lambda: _eye_open(1), "smug": lambda: _eye_smug(1),
                             "closed": lambda: _eye_closed(1), "squeeze": lambda: _eye_squeeze(1),
-                            "spark": lambda: _eye_open(1, True)}),
-    Part("brow_L", "brow_L", {"default": lambda: _brow(-1), "raised": lambda: _brow(-1, True)}),
-    Part("brow_R", "brow_R", {"default": lambda: _brow(1), "raised": lambda: _brow(1, True)}),
+                            "spark": lambda: _eye_open(1, True), "angry": lambda: _eye_angry(1),
+                            "wide": lambda: _eye_wide(1)}),
+    Part("brow_L", "brow_L", {"default": lambda: _brow(-1), "raised": lambda: _brow(-1, True),
+                              "angry": lambda: _brow_angry(-1)}),
+    Part("brow_R", "brow_R", {"default": lambda: _brow(1), "raised": lambda: _brow(1, True),
+                              "angry": lambda: _brow_angry(1)}),
     Part("arm_R", "arm_R", {"default": lambda: _arm(1)}),
-    Part("card", "paw_R", {"default": _empty, "hold": _card}),
-    Part("paw_R", "paw_R", {"default": lambda: _paw(1)}),
     Part("arm_L", "arm_L", {"default": lambda: _arm(-1)}),
+    Part("controller", "body", {"default": _empty, "hold": _controller}),
+    Part("card", "paw_R", {"default": _empty, "hold": _card}),
+    Part("paw_R", "paw_R", {"default": lambda: _paw(1), "point": lambda: _paw_point(1)}),
     Part("paw_L", "paw_L", {"default": lambda: _paw(-1), "thumb": lambda: _paw_thumb(-1)}),
 ]
 
 # 顔まわり（ギャグの変形で一緒にゆがめるパーツ）
 FACE_PARTS = ["head", "face_white", "cheek_L", "cheek_R", "muzzle", "mouth", "nose",
               "eye_L", "eye_R", "brow_L", "brow_R", "ear_L", "ear_R"]
+
+# 汎用モーション（lib/inutarou_anim/motions.py）が使う姿勢
+MOTION = {
+    # コントローラーを両手で持つ（腕を内側に寄せ、手は上向きのまま）
+    "game": {"pose": {"arm_L": {"rot": 35}, "paw_L": {"rot": -35}, "arm_R": {"rot": -35},
+                      "paw_R": {"rot": 35}, "eye_L": {"loc": (0.0, -0.06)},
+                      "eye_R": {"loc": (0.0, -0.06)}, "head": {"rot": 0}}},
+}

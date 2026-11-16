@@ -38,6 +38,10 @@ class Ctx:
     def background_module(self, name: str):
         return stage.load_module(ROOT / "assets" / "backgrounds" / f"{name}.py", f"bg_{name}")
 
+    def props(self, name: str = "items"):
+        """assets/props/<name>.py（小道具の形）を読み込む。"""
+        return stage.load_module(ROOT / "assets" / "props" / f"{name}.py", f"props_{name}")
+
     def text(self, body, pos, size, **kw):
         return stage.Text(self.collection, body, pos, size, **kw)
 

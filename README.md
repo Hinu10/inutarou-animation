@@ -128,6 +128,22 @@
 
 ---
 
+## レンダリング
+
+```sh
+python3 -m unittest discover -s tests                 # Blender なしのテスト
+scripts/render/render_shot.sh s1_potechi              # ショットを MP4 まで（1920x1080）
+PERCENT=50 scripts/render/render_shot.sh s1_potechi   # 確認用の半分サイズ（960x540）
+```
+
+- ショットは `s1_potechi` `s2_karasu` `s3_argument` `s4_window` `s5_crow` `s6_card` `s6_ending` の 7本で、第1話の 60 秒を全部カバーする（どれも仮素材）。
+- 出力は `renders/episode01/<shot>/<shot>.mp4`（連番 PNG・仮音声・`.blend` も同じフォルダ）。
+- 1コマだけ確認するとき: `Blender -b --factory-startup --python scripts/build_shot.py -- --shot s3_argument --still 640`
+- 仮キャラクターの表情一覧: `Blender -b --factory-startup --python scripts/preview_characters.py -- renders/preview/characters.png`
+- 話全体の書き出し・結合・検査は Codex の担当（#49〜#51）。
+
+詳しくは `docs/production/shots.md`（ショットの書き方）、`docs/production/asset-replacement.md`（素材の差し替え方法）、`docs/production/environment.md`（必要なソフト）。
+
 ## 今そろっていないもの（オーナーの用意が必要）
 
 - 正式キャラクターデザイン（犬太朗・海斗・カラス）

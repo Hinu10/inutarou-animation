@@ -95,6 +95,14 @@ def _eye(s, kind="default"):
                 Shape(ellipse(x, 6.3, 0.035, 0.035), fill="black", line=None)]
     if kind == "closed":
         return [Shape(curve([(x - 0.13, 6.3), (x, 6.25), (x + 0.13, 6.3)]), width=0.05, closed=False)]
+    if kind == "half":
+        # 疑い・呆れのジト目（まぶたが水平）
+        lower = ellipse(x, 6.26, 0.09, 0.12, n=24, start=3.3, end=6.12)
+        return [Shape(lower, fill="black", line=None),
+                Shape([(x - 0.15, 6.29), (x + 0.15, 6.29)], width=0.055, closed=False)]
+    if kind == "dot":
+        # ぽかん・あぜん（点の目）
+        return [Shape(ellipse(x, 6.28, 0.045, 0.06), fill="black", line=None)]
     raise KeyError(kind)
 
 
@@ -103,6 +111,13 @@ def _brow(s, kind="default"):
     if kind == "default":
         return [Shape(curve([(x - 0.15, 6.6), (x, 6.65), (x + 0.15, 6.6)]), line="kaito_hair",
                       width=0.06, closed=False, taper=0.8)]
+    if kind == "raised":
+        return [Shape(curve([(x - 0.15, 6.7), (x, 6.78), (x + 0.15, 6.71)]), line="kaito_hair",
+                      width=0.06, closed=False, taper=0.8)]
+    if kind == "worried":
+        # 困り眉（内側が上がる）
+        return [Shape([(x + 0.16 * s, 6.6), (x - 0.15 * s, 6.72)], line="kaito_hair", width=0.07,
+                      closed=False, taper=0.5)]
     # 怒り眉（内側が下がる）
     inner, outer = x - 0.16 * s, x + 0.16 * s
     return [Shape([(outer, 6.7), (inner, 6.52)], line="kaito_hair", width=0.09, closed=False,
@@ -119,6 +134,15 @@ def _mouth(kind="default"):
         for x in (-0.12, 0.0, 0.12):
             out.append(Shape([(x, 5.76), (x, 5.92)], width=0.02, closed=False))
         return out
+    if kind == "talk":
+        m = blob([(-0.17, 5.88), (0, 5.89), (0.17, 5.88), (0.1, 5.76), (-0.1, 5.76)], samples=5)
+        return [Shape(m, fill="kaito_mouth", width=0.04)]
+    if kind == "smile":
+        # 気まずい笑い
+        return [Shape(curve([(-0.2, 5.9), (0, 5.8), (0.2, 5.9)]), width=0.045, closed=False, taper=0.6)]
+    if kind == "wavy":
+        return [Shape([(-0.2, 5.84), (-0.1, 5.88), (0, 5.84), (0.1, 5.88), (0.2, 5.84)], width=0.04,
+                      closed=False, taper=0.5)]
     if kind == "o":
         return [Shape(ellipse(0, 5.82, 0.1, 0.13), fill="kaito_mouth", width=0.04)]
     if kind == "scream":
@@ -172,8 +196,32 @@ def _hand(s, kind="open"):
         # スマホを持つ手（画面は海斗の方を向いている想定で、裏面が見える）
         return [Shape(rect(x + 0.05 * s, y - 0.05, 0.36, 0.62, r=0.06), fill="phone", width=0.04),
                 Shape(ellipse(x + 0.02 * s, y - 0.18, 0.18, 0.18), fill="kaito_skin", width=W)]
+    if kind == "potechi":
+        # ポテチの袋を持つ手
+        bag = rect(x + 0.05 * s, y - 0.2, 0.62, 0.8, r=0.05)
+        return [Shape(bag, fill="potechi", width=0.045),
+                Shape(rect(x + 0.05 * s, y + 0.17, 0.66, 0.08), fill="potechi_red", width=0.03),
+                Shape(rect(x + 0.05 * s, y - 0.57, 0.66, 0.08), fill="potechi_red", width=0.03),
+                Shape(ellipse(x + 0.05 * s, y - 0.22, 0.17, 0.13), fill="gold", width=0.025),
+                Shape(ellipse(x + 0.02 * s, y - 0.02, 0.17, 0.21), fill="kaito_skin", width=W)]
+    if kind == "wallet":
+        # 開いた財布を持つ手（中身は空のカード入れ）
+        out = [Shape(rect(x + 0.1 * s, y - 0.1, 0.8, 0.52, r=0.05), fill="wallet", width=0.045),
+               Shape([(x + 0.1 * s, y + 0.16), (x + 0.1 * s, y - 0.36)], line="wallet_dark",
+                     width=0.035, closed=False)]
+        for k in range(3):
+            yy = y + 0.06 - k * 0.12
+            out.append(Shape([(x - 0.25 * s, yy), (x - 0.02 * s, yy)], line="wallet_dark", width=0.025,
+                             closed=False))
+        out.append(Shape(ellipse(x + 0.02 * s, y - 0.18, 0.17, 0.19), fill="kaito_skin", width=W))
+        return out
     raise KeyError(kind)
 
+
+EYES = ("default", "glare", "rage", "closed", "half", "dot")
+BROWS = ("default", "angry", "raised", "worried")
+MOUTHS = ("default", "grit", "o", "scream", "talk", "smile", "wavy")
+HANDS = ("open", "fist", "phone", "potechi", "wallet")
 
 PARTS = [
     Part("leg_L", "leg_L", {"default": lambda: _leg(-1)}),
@@ -181,20 +229,18 @@ PARTS = [
     Part("torso", "spine", {"default": _torso}),
     Part("head", "head", {"default": _head, "scream": _head_scream}),
     Part("hair", "hair", {"default": _hair}),
-    Part("eye_L", "eye_L", {k: (lambda k=k: _eye(-1, k)) for k in ("default", "glare", "rage", "closed")}),
-    Part("eye_R", "eye_R", {k: (lambda k=k: _eye(1, k)) for k in ("default", "glare", "rage", "closed")}),
-    Part("brow_L", "brow_L", {"default": lambda: _brow(-1), "angry": lambda: _brow(-1, "angry")}),
-    Part("brow_R", "brow_R", {"default": lambda: _brow(1), "angry": lambda: _brow(1, "angry")}),
-    Part("mouth", "mouth", {k: (lambda k=k: _mouth(k)) for k in ("default", "grit", "o", "scream")}),
+    Part("eye_L", "eye_L", {k: (lambda k=k: _eye(-1, k)) for k in EYES}),
+    Part("eye_R", "eye_R", {k: (lambda k=k: _eye(1, k)) for k in EYES}),
+    Part("brow_L", "brow_L", {k: (lambda k=k: _brow(-1, k)) for k in BROWS}),
+    Part("brow_R", "brow_R", {k: (lambda k=k: _brow(1, k)) for k in BROWS}),
+    Part("mouth", "mouth", {k: (lambda k=k: _mouth(k)) for k in MOUTHS}),
     Part("vein", "vein", {"default": lambda: _vein(False), "on": _vein}),
     Part("arm_L", "arm_L", {"default": lambda: _upper(-1)}),
     Part("fore_L", "fore_L", {"default": lambda: _fore(-1)}),
-    Part("hand_L", "hand_L", {k: (lambda k=k: _hand(-1, k)) for k in ("open", "fist", "phone")},
-         default="open"),
+    Part("hand_L", "hand_L", {k: (lambda k=k: _hand(-1, k)) for k in HANDS}, default="open"),
     Part("arm_R", "arm_R", {"default": lambda: _upper(1)}),
     Part("fore_R", "fore_R", {"default": lambda: _fore(1)}),
-    Part("hand_R", "hand_R", {k: (lambda k=k: _hand(1, k)) for k in ("open", "fist", "phone")},
-         default="open"),
+    Part("hand_R", "hand_R", {k: (lambda k=k: _hand(1, k)) for k in HANDS}, default="open"),
 ]
 
 # 顔の赤み（怒り）をのせるパーツ
