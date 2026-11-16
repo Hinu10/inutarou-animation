@@ -28,7 +28,7 @@ narration = { voice = "Kyoko", rate = 420 }
 wide = { center = [0.0, 0.0], scale = 16.0 }
 two_shot = { center = [-0.3, -0.25], scale = 12.5 }
 inu_close = { center = [1.9, 1.05], scale = 4.6 }
-inu_hand = { center = [1.5, 0.8], scale = 4.0 }
+inu_hand = { center = [2.35, -0.75], scale = 4.0 }
 kaito_close = { center = [-2.7, 1.7], scale = 5.4 }
 
 # ------------------------------------------------------------------ SCENE 1（0〜8秒）
@@ -41,7 +41,8 @@ background = "apartment_room"
 characters = ["kaito", "inutarou"]
 props = ["potechi", "game_controller", "tv"]
 action = "海斗がアパートの机にポテチを置く。犬太朗はソファでゲームをしている。"
-status = "todo"
+shot = "s1_potechi"
+status = "temp"
   [[cut.line]]
   at = 1.5
   speaker = "kaito"
@@ -56,7 +57,8 @@ background = "apartment_room"
 characters = ["kaito", "inutarou"]
 props = ["potechi", "game_controller"]
 action = "犬太朗は無言のままゲームを続ける。海斗が部屋を出る。"
-status = "todo"
+shot = "s1_potechi"
+status = "temp"
 
 # ------------------------------------------------------------------ SCENE 2（8〜16秒）
 [[cut]]
@@ -68,7 +70,8 @@ background = "apartment_room"
 characters = ["karasu", "inutarou"]
 props = ["potechi"]
 action = "窓からカラスが侵入する。"
-status = "todo"
+shot = "s2_karasu"
+status = "temp"
   [[cut.sfx]]
   at = 0.5
   name = "wings"
@@ -77,12 +80,13 @@ status = "todo"
 id = "s2c02"
 scene = 2
 seconds = 2.5
-camera = { center = [0.0, -1.0], scale = 8.0 }
+camera = { center = [-4.0, -0.8], scale = 8.0 }
 background = "apartment_room"
 characters = ["karasu"]
 props = ["potechi"]
 action = "カラスが机の上のポテチをくわえて飛び去る。"
-status = "todo"
+shot = "s2_karasu"
+status = "temp"
 
 [[cut]]
 id = "s2c03"
@@ -93,7 +97,8 @@ background = "apartment_room"
 characters = ["inutarou"]
 props = ["game_controller"]
 action = "犬太朗が一瞬カラスを見たあと、再びゲームに戻る。"
-status = "todo"
+shot = "s2_karasu"
+status = "temp"
   [[cut.line]]
   at = 0.3
   speaker = "inutarou"
@@ -109,7 +114,8 @@ camera = { preset = "wide" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "海斗が戻ってくる。"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
   [[cut.line]]
   at = 1.0
   speaker = "kaito"
@@ -123,7 +129,8 @@ camera = { preset = "two_shot" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "犬太朗が答える。"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
   [[cut.line]]
   at = 0.3
   speaker = "inutarou"
@@ -138,7 +145,8 @@ camera = { preset = "kaito_close" }
 background = "apartment_room"
 characters = ["kaito"]
 action = "海斗が疑う。"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
   [[cut.line]]
   at = 0.4
   speaker = "kaito"
@@ -152,7 +160,8 @@ camera = { preset = "inu_close" }
 background = "apartment_room"
 characters = ["inutarou"]
 action = "犬太朗が否定する。"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
   [[cut.line]]
   at = 0.2
   speaker = "inutarou"
@@ -168,7 +177,8 @@ background = "freeze"
 characters = ["inutarou"]
 action = "映像が一瞬停止。明るく唐突なナレーションが超早口で割り込む（約1秒が目標。伝わらなければ延ばす）。"
 note = "停止の長さはこの seconds で調整する"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
   [[cut.line]]
   at = 0.1
   speaker = "narration"
@@ -182,7 +192,8 @@ camera = { preset = "two_shot" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "映像が再開する。"
-status = "todo"
+shot = "s3_argument"
+status = "temp"
 
 # ------------------------------------------------------------------ SCENE 4（30〜41秒）
 [[cut]]
@@ -193,7 +204,8 @@ camera = { preset = "two_shot" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "犬太朗が窓を指さす。"
-status = "todo"
+shot = "s4_window"
+status = "temp"
   [[cut.line]]
   at = 0.3
   speaker = "inutarou"
@@ -208,7 +220,8 @@ camera = { preset = "kaito_close" }
 background = "apartment_room"
 characters = ["kaito"]
 action = "海斗には吠えているようにしか聞こえない。"
-status = "todo"
+shot = "s4_window"
+status = "temp"
   [[cut.line]]
   at = 0.3
   speaker = "kaito"
@@ -222,7 +235,8 @@ camera = { preset = "two_shot" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "犬太朗がキレる。海斗は呆れる。"
-status = "todo"
+shot = "s4_window"
+status = "temp"
   [[cut.line]]
   at = 0.3
   speaker = "inutarou"
@@ -239,7 +253,8 @@ background = "apartment_room"
 characters = ["karasu"]
 props = ["potechi"]
 action = "窓の外にポテチの袋をくわえたカラスが現れる。"
-status = "todo"
+shot = "s5_crow"
+status = "temp"
 
 [[cut]]
 id = "s5c02"
@@ -249,7 +264,8 @@ camera = { preset = "two_shot" }
 background = "apartment_room"
 characters = ["kaito", "inutarou"]
 action = "海斗が気づいて謝る。"
-status = "todo"
+shot = "s5_crow"
+status = "temp"
   [[cut.line]]
   at = 0.2
   speaker = "kaito"
@@ -267,7 +283,8 @@ camera = { preset = "inu_close" }
 background = "apartment_room"
 characters = ["inutarou"]
 action = "犬太朗がぼやく。"
-status = "todo"
+shot = "s5_crow"
+status = "temp"
   [[cut.line]]
   at = 0.2
   speaker = "inutarou"
@@ -284,7 +301,8 @@ background = "apartment_room"
 characters = ["kaito", "inutarou"]
 props = ["wallet"]
 action = "海斗が財布を開く。"
-status = "todo"
+shot = "s6_card"
+status = "temp"
   [[cut.line]]
   at = 0.1
   speaker = "kaito"
@@ -299,7 +317,8 @@ background = "apartment_room"
 characters = ["kaito"]
 props = ["wallet"]
 action = "カードがない。"
-status = "todo"
+shot = "s6_card"
+status = "temp"
   [[cut.line]]
   at = 0.1
   speaker = "kaito"
@@ -314,7 +333,8 @@ background = "apartment_room"
 characters = ["inutarou"]
 props = ["credit_card"]
 action = "犬太朗の手元に海斗のクレジットカードがある。"
-status = "todo"
+shot = "s6_card"
+status = "temp"
 
 [[cut]]
 id = "s6c04"
@@ -325,7 +345,8 @@ background = "apartment_room"
 characters = ["kaito"]
 props = ["phone"]
 action = "海斗のスマホに通知「ゲーム内アイテム購入　¥30,000」。"
-status = "todo"
+shot = "s6_card"
+status = "temp"
   [[cut.sfx]]
   at = 0.0
   name = "notify"
