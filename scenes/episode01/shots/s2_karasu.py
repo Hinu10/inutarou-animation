@@ -28,7 +28,7 @@ def bezier(p0, p1, p2, p3):
 def build(ctx) -> dict:
     ep = ctx.episode
     c1, c2, c3 = (ep.cut(i) for i in CUTS)
-    r = common.setup(ctx, kai=False, crow=True)
+    r = common.setup(ctx, kai=False, crow=True, crow_depth=0.5)   # 犬太朗より奥を飛ぶ
     inu, crow = r.inu, r.crow
     desk = r.room.SPOTS["desk_top"]
     perch = (desk[0] + 0.7, desk[1] + 0.11)      # 机の天板の上（袋の右）
