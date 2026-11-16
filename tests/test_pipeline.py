@@ -1,5 +1,6 @@
 """Cut-sheet checks that run without Blender or rendered media."""
 import sys
+import tempfile
 import tomllib
 import unittest
 from pathlib import Path
@@ -10,6 +11,19 @@ from inutarou_anim import timeline  # noqa: E402
 
 
 class CutSheetChecks(unittest.TestCase):
+    def test_audio_cues_follow_cut_duration(self):
+        sheet = ROOT / "scenes/episode01/cuts.toml"
+        original = timeline.load(sheet)
+        text = sheet.read_text(encoding="utf-8")
+        self.assertIn('seconds = 4.0', text)
+        with tempfile.TemporaryDirectory() as folder:
+            modified = Path(folder) / "cuts.toml"
+            modified.write_text(text.replace('seconds = 4.0', 'seconds = 5.0', 1), encoding="utf-8")
+            shifted = timeline.load(modified)
+        old = next(q for q in original.cues() if q.cut == "s2c03")
+        new = next(q for q in shifted.cues() if q.cut == "s2c03")
+        self.assertEqual(new.frame - old.frame, original.fps)
+
     def test_references_and_timing(self):
         for sheet in (ROOT / "scenes").glob("*/cuts.toml"):
             with self.subTest(sheet=sheet):
