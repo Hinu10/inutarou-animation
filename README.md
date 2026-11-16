@@ -134,13 +134,26 @@
 python3 -m unittest discover -s tests                 # Blender なしのテスト
 scripts/render/render_shot.sh s1_potechi              # ショットを MP4 まで（1920x1080）
 PERCENT=50 scripts/render/render_shot.sh s1_potechi   # 確認用の半分サイズ（960x540）
+python3 scripts/render/render_episode.py cut episode01 s1c01 --percent 50
+python3 scripts/render/render_episode.py episode episode01 --percent 50
+python3 scripts/qc/check_output.py renders/episode01/episode01.mp4 --percent 50
 ```
 
 - ショットは `s1_potechi` `s2_karasu` `s3_argument` `s4_window` `s5_crow` `s6_card` `s6_ending` の 7本で、第1話の 60 秒を全部カバーする（どれも仮素材）。
 - 出力は `renders/episode01/<shot>/<shot>.mp4`（連番 PNG・仮音声・`.blend` も同じフォルダ）。
 - 1コマだけ確認するとき: `Blender -b --factory-startup --python scripts/build_shot.py -- --shot s3_argument --still 640`
 - 仮キャラクターの表情一覧: `Blender -b --factory-startup --python scripts/preview_characters.py -- renders/preview/characters.png`
-- 話全体の書き出し・結合・検査は Codex の担当（#49〜#51）。
+- 話全体の書き出し・結合・検査は `render_episode.py` と `check_output.py` が行う（#49〜#51）。
+
+`render_episode.py` はカット単位・話全体を出力する。未実装のカットはカット ID 付きの黒い仮画面にする。検査スクリプトは画面サイズ、24fps、尺、H.264/AAC と黒画面・無音区間を確認する。演出上の黒画面や無音は `--allow-black` / `--allow-silence` を指定する。書き出しコマンド内の検査は構造と尺だけを確認する。音量目標は暫定の -24 LUFS で、正式な納品基準はオーナーが決める。
+
+新しい話のひな形は `python3 scripts/render/new_episode.py episode02 --title "話のタイトル"` で作る。
+
+正式音声を `[[cut.line]]` / `[[cut.sfx]]` の `audio` に指定すると、カット表のタイミングでミックスする。仮ナレーションの聞こえ方は `python3 scripts/audio/temp_audio.py --episode episode01 --narration-rate 360 --out renders/episode01/narration_test.wav` のように速度を変えて比較する。収録音声が入った後は `python3 scripts/audio/lip_sync.py --episode episode01 --out renders/episode01/lip_sync.json` で口の開閉タイミングを出力する。現在のアニメーション側はこの JSON をまだ読み込まない。
+
+## 大きいファイルの扱い
+
+`renders/` は生成物なので Git に入れない。`.blend`、連番 PNG、仮 WAV、作業中 MP4 はこの中で再生成する。正式な音声など再生成できない素材は `assets/` に置き、ライセンスと出所を記録する。50 MB を超える正式素材を追加する場合は Git LFS を設定してからコミットする。完成 MP4 は公開先に配置し、Git には入れない。
 
 詳しくは `docs/production/shots.md`（ショットの書き方）、`docs/production/asset-replacement.md`（素材の差し替え方法）、`docs/production/environment.md`（必要なソフト）。
 
