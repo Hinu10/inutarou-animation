@@ -10,6 +10,7 @@ import random
 from dataclasses import dataclass
 
 from inutarou_anim import effects as ef
+from inutarou_anim import lipsync
 from inutarou_anim import motions as mo
 from inutarou_anim import stage
 from inutarou_anim.actor import Actor, P, at, merge
@@ -73,6 +74,8 @@ class Room:
 
 def setup(ctx, inu: bool = True, kai: bool = True, crow: bool = False,
           crow_depth: float = -1.0) -> Room:
+    global _episode
+    _episode = ctx.episode
     col = ctx.collection
     room_mod = ctx.background_module("apartment_room")
     r = Room(ctx=ctx, room=room_mod, props=ctx.props("items"),
@@ -90,6 +93,9 @@ def setup(ctx, inu: bool = True, kai: bool = True, crow: bool = False,
     return r
 
 
+_episode = None   # setup() で入る。talk() が lip_sync.json を引くのに使う
+
+
 def line(cut, speaker: str | None = None, n: int = 0):
     """カットのセリフ（n 番目）。"""
     qs = [q for q in cut.cues if q.kind == "line" and (speaker is None or q.speaker == speaker)]
@@ -97,9 +103,25 @@ def line(cut, speaker: str | None = None, n: int = 0):
 
 
 def talk(actor, cue, open_=("talk", "open"), closed="default", end_variant=None, seed=0,
-         fps: int = 24, frames: int | None = None) -> int:
-    n = frames or mo.speech_frames(cue.text, cue.rate, fps)
+         fps: int = 24, frames: int | None = None, ep=None) -> int:
+    """セリフの口パク。
+
+    収録音声（line.audio）の lip_sync.json があればその開閉タイミングを使う（#63）。
+    開いた口は JSON の open_variant（犬太朗 open / 海斗 o）、閉じた口と言い終わりは
+    ショットで指定した closed / end_variant（ふくれ顔のまましゃべる、などの演技を残すため）。
+    無ければ従来どおり仮の口パク（ランダムに開け閉め）。
+    """
     have = actor.rig.parts["mouth"].variants
+    ep = ep or _episode
+    if ep is not None:
+        hit = lipsync.keys_for(cue, ep.id, ep.cut(cue.cut).end, ep.fps)
+        if hit:
+            tr, keys = hit
+            op = tr.open_variant if tr.open_variant in have else next(
+                (v for v in open_ if v in have), "talk")
+            return mo.talk_keys(actor, keys, open_=op, closed=closed, end_variant=end_variant,
+                                end=ep.cut(cue.cut).end)
+    n = frames or mo.speech_frames(cue.text, cue.rate, fps)
     open_ = tuple(v for v in open_ if v in have) or ("talk",)
     return mo.talk(actor, cue.frame, n, open_=open_, closed=closed, end_variant=end_variant,
                    seed=seed)
