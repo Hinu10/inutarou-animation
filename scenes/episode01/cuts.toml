@@ -1,0 +1,432 @@
+# 第1話「消えたポテチ」カット表
+#
+# - カットは上から順に並べる。開始位置は書かない（長さの合計で自動的に決まる）。
+# - 長さは seconds（秒）か frames（コマ, 24fps）のどちらか。
+# - セリフ [[cut.line]] / 効果音 [[cut.sfx]] の位置は、カットの頭からの at（秒）か at_frame（コマ）。
+# - camera: center = 画面中心のワールド座標 [x, y]、scale = 画面の横幅（ワールド単位）。
+#   preset を書くと [cameras] の値を使う。
+# - status: todo（未着手）/ temp（仮素材で実装済み）/ final（正式素材で完成）
+# - shot: このカットを実装しているスクリプト（scenes/episode01/shots/<shot>.py）
+# - 犬太朗のセリフは視聴者には日本語、人間（海斗）には鳴き声 → heard_by_humans = "bark"
+#
+# 秒数は脚本の暫定値。演技に合わせて変えてよい（合計は約60秒が目標）。
+
+[episode]
+id = "episode01"
+title = "消えたポテチ"
+fps = 24
+width = 1920
+height = 1080
+
+# 仮音声（macOS の say）の声。正式音声が入ったら line の audio に置き換える
+[temp_voices]
+kaito = { voice = "Reed", rate = 190 }
+inutarou = { voice = "Rocko", rate = 210 }
+narration = { voice = "Kyoko", rate = 420 }
+
+[cameras]
+wide = { center = [0.0, 0.0], scale = 16.0 }
+two_shot = { center = [-0.3, -0.25], scale = 12.5 }
+inu_close = { center = [1.9, 1.05], scale = 4.6 }
+inu_hand = { center = [2.35, -0.75], scale = 4.0 }
+kaito_close = { center = [-2.7, 1.7], scale = 5.4 }
+
+# ------------------------------------------------------------------ SCENE 1（0〜8秒）
+[[cut]]
+id = "s1c01"
+scene = 1
+seconds = 4.0
+camera = { preset = "wide" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+props = ["potechi", "game_controller", "tv"]
+action = "海斗がアパートの机にポテチを置く。犬太朗はソファでゲームをしている。"
+shot = "s1_potechi"
+status = "temp"
+  [[cut.line]]
+  at = 1.5
+  speaker = "kaito"
+  text = "ちょっとトイレ行ってくるわ"
+
+[[cut]]
+id = "s1c02"
+scene = 1
+seconds = 4.0
+camera = { preset = "wide" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+props = ["potechi", "game_controller"]
+action = "犬太朗は無言のままゲームを続ける。海斗が部屋を出る。"
+shot = "s1_potechi"
+status = "temp"
+
+# ------------------------------------------------------------------ SCENE 2（8〜16秒）
+[[cut]]
+id = "s2c01"
+scene = 2
+seconds = 3.0
+camera = { preset = "wide" }
+background = "apartment_room"
+characters = ["karasu", "inutarou"]
+props = ["potechi"]
+action = "窓からカラスが侵入する。"
+shot = "s2_karasu"
+status = "temp"
+  [[cut.sfx]]
+  at = 0.5
+  name = "wings"
+
+[[cut]]
+id = "s2c02"
+scene = 2
+seconds = 2.5
+camera = { center = [-4.0, -0.8], scale = 8.0 }
+background = "apartment_room"
+characters = ["karasu"]
+props = ["potechi"]
+action = "カラスが机の上のポテチをくわえて飛び去る。"
+shot = "s2_karasu"
+status = "temp"
+
+[[cut]]
+id = "s2c03"
+scene = 2
+seconds = 2.5
+camera = { preset = "inu_close" }
+background = "apartment_room"
+characters = ["inutarou"]
+props = ["game_controller"]
+action = "犬太朗が一瞬カラスを見たあと、再びゲームに戻る。"
+shot = "s2_karasu"
+status = "temp"
+  [[cut.line]]
+  at = 0.3
+  speaker = "inutarou"
+  text = "……は？ 何だあいつ"
+  heard_by_humans = "bark"
+
+# ------------------------------------------------------------------ SCENE 3（16〜30秒）
+[[cut]]
+id = "s3c01"
+scene = 3
+seconds = 3.0
+camera = { preset = "wide" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "海斗が戻ってくる。"
+shot = "s3_argument"
+status = "temp"
+  [[cut.line]]
+  at = 1.0
+  speaker = "kaito"
+  text = "あれ？ ポテチどこいった？"
+
+[[cut]]
+id = "s3c02"
+scene = 3
+seconds = 2.5
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "犬太朗が答える。"
+shot = "s3_argument"
+status = "temp"
+  [[cut.line]]
+  at = 0.3
+  speaker = "inutarou"
+  text = "カラスが持ってったぞ"
+  heard_by_humans = "bark"
+
+[[cut]]
+id = "s3c03"
+scene = 3
+seconds = 2.5
+camera = { preset = "kaito_close" }
+background = "apartment_room"
+characters = ["kaito"]
+action = "海斗が疑う。"
+shot = "s3_argument"
+status = "temp"
+  [[cut.line]]
+  at = 0.4
+  speaker = "kaito"
+  text = "……お前、食った？"
+
+[[cut]]
+id = "s3c04"
+scene = 3
+seconds = 2.0
+camera = { preset = "inu_close" }
+background = "apartment_room"
+characters = ["inutarou"]
+action = "犬太朗が否定する。"
+shot = "s3_argument"
+status = "temp"
+  [[cut.line]]
+  at = 0.2
+  speaker = "inutarou"
+  text = "は？ 俺じゃねぇし！"
+  heard_by_humans = "bark"
+
+[[cut]]
+id = "s3c05"
+scene = 3
+seconds = 1.5
+camera = { preset = "inu_close" }
+background = "freeze"
+characters = ["inutarou"]
+action = "映像が一瞬停止。明るく唐突なナレーションが超早口で割り込む（約1秒が目標。伝わらなければ延ばす）。"
+note = "停止の長さはこの seconds で調整する"
+shot = "s3_argument"
+status = "temp"
+  [[cut.line]]
+  at = 0.1
+  speaker = "narration"
+  text = "ここで忠告！ 犬太朗の言葉は人間には鳴き声としてしか伝わりません！"
+
+[[cut]]
+id = "s3c06"
+scene = 3
+seconds = 2.5
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "映像が再開する。"
+shot = "s3_argument"
+status = "temp"
+
+# ------------------------------------------------------------------ SCENE 4（30〜41秒）
+[[cut]]
+id = "s4c01"
+scene = 4
+seconds = 4.0
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "犬太朗が窓を指さす。"
+shot = "s4_window"
+status = "temp"
+  [[cut.line]]
+  at = 0.3
+  speaker = "inutarou"
+  text = "だからカラスだって！ あっちだよ！"
+  heard_by_humans = "bark"
+
+[[cut]]
+id = "s4c02"
+scene = 4
+seconds = 3.0
+camera = { preset = "kaito_close" }
+background = "apartment_room"
+characters = ["kaito"]
+action = "海斗には吠えているようにしか聞こえない。"
+shot = "s4_window"
+status = "temp"
+  [[cut.line]]
+  at = 0.3
+  speaker = "kaito"
+  text = "何そんな吠えてんだよ"
+
+[[cut]]
+id = "s4c03"
+scene = 4
+seconds = 4.0
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "犬太朗がキレる。海斗は呆れる。"
+shot = "s4_window"
+status = "temp"
+  [[cut.line]]
+  at = 0.3
+  speaker = "inutarou"
+  text = "話通じねぇなこいつ！"
+  heard_by_humans = "bark"
+
+# ------------------------------------------------------------------ SCENE 5（41〜49秒）
+[[cut]]
+id = "s5c01"
+scene = 5
+seconds = 3.0
+camera = { center = [4.5, 1.2], scale = 7.0 }
+background = "apartment_room"
+characters = ["karasu"]
+props = ["potechi"]
+action = "窓の外にポテチの袋をくわえたカラスが現れる。"
+shot = "s5_crow"
+status = "temp"
+
+[[cut]]
+id = "s5c02"
+scene = 5
+seconds = 3.0
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "海斗が気づいて謝る。"
+shot = "s5_crow"
+status = "temp"
+  [[cut.line]]
+  at = 0.2
+  speaker = "kaito"
+  text = "……あ、カラスか"
+  [[cut.line]]
+  at = 1.6
+  speaker = "kaito"
+  text = "悪かったな"
+
+[[cut]]
+id = "s5c03"
+scene = 5
+seconds = 2.0
+camera = { preset = "inu_close" }
+background = "apartment_room"
+characters = ["inutarou"]
+action = "犬太朗がぼやく。"
+shot = "s5_crow"
+status = "temp"
+  [[cut.line]]
+  at = 0.2
+  speaker = "inutarou"
+  text = "ったく、ふざけんなよ"
+  heard_by_humans = "bark"
+
+# ------------------------------------------------------------------ SCENE 6（49〜60秒）
+[[cut]]
+id = "s6c01"
+scene = 6
+seconds = 2.0
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+props = ["wallet"]
+action = "海斗が財布を開く。"
+shot = "s6_card"
+status = "temp"
+  [[cut.line]]
+  at = 0.1
+  speaker = "kaito"
+  text = "しゃーねぇ、買い直しに行くか"
+
+[[cut]]
+id = "s6c02"
+scene = 6
+seconds = 1.5
+camera = { preset = "kaito_close" }
+background = "apartment_room"
+characters = ["kaito"]
+props = ["wallet"]
+action = "カードがない。"
+shot = "s6_card"
+status = "temp"
+  [[cut.line]]
+  at = 0.1
+  speaker = "kaito"
+  text = "……あれ？ カードは？"
+
+[[cut]]
+id = "s6c03"
+scene = 6
+seconds = 1.0
+camera = { preset = "inu_hand" }
+background = "apartment_room"
+characters = ["inutarou"]
+props = ["credit_card"]
+action = "犬太朗の手元に海斗のクレジットカードがある。"
+shot = "s6_card"
+status = "temp"
+
+[[cut]]
+id = "s6c04"
+scene = 6
+seconds = 1.5
+camera = { preset = "kaito_close" }
+background = "apartment_room"
+characters = ["kaito"]
+props = ["phone"]
+action = "海斗のスマホに通知「ゲーム内アイテム購入　¥30,000」。"
+shot = "s6_card"
+status = "temp"
+  [[cut.sfx]]
+  at = 0.0
+  name = "notify"
+  [[cut.line]]
+  at = 0.7
+  speaker = "kaito"
+  text = "……お前か？"
+
+# ---- ここから下が試作（ラスト5秒） shot = "s6_ending"
+[[cut]]
+id = "s6c05"
+scene = 6
+frames = 26
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+props = ["phone", "credit_card"]
+action = "海斗が怒りをこらえて犬太朗を見る（震え・青筋・顔が赤くなる）。"
+shot = "s6_ending"
+status = "temp"
+
+[[cut]]
+id = "s6c06"
+scene = 6
+frames = 30
+camera = { preset = "inu_close" }
+background = "apartment_room"
+characters = ["inutarou"]
+props = ["credit_card"]
+action = "犬太朗が無言で得意げにグッドサイン。片目がキランと光る。"
+shot = "s6_ending"
+status = "temp"
+  [[cut.sfx]]
+  at_frame = 18
+  name = "kiran"
+  text = "キラーン♪"
+
+[[cut]]
+id = "s6c07"
+scene = 6
+frames = 14
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "一瞬の静寂（全員止まる）。"
+note = "静寂の長さはこの frames で調整する"
+shot = "s6_ending"
+status = "temp"
+
+[[cut]]
+id = "s6c08"
+scene = 6
+frames = 22
+camera = { preset = "kaito_close" }
+background = "focus_lines"
+characters = ["kaito"]
+action = "海斗「テメェェェ！！！」（ため → 爆発、画面揺れ、集中線）。"
+shot = "s6_ending"
+status = "temp"
+  [[cut.line]]
+  at_frame = 4
+  speaker = "kaito"
+  text = "テメェェェ！！！"
+  rate = 230
+  gain = 1.3
+
+[[cut]]
+id = "s6c09"
+scene = 6
+frames = 28
+camera = { preset = "two_shot" }
+background = "apartment_room"
+characters = ["kaito", "inutarou"]
+action = "アッパー気味のツッコミ。犬太朗のほお・口・目・輪郭がぐにゃっと持ち上がり、インパクトの瞬間で止め絵。"
+shot = "s6_ending"
+status = "temp"
+  [[cut.sfx]]
+  at_frame = 5
+  name = "whoosh"
+  [[cut.sfx]]
+  at_frame = 8
+  name = "bokaa"
+  text = "ボカァッ！！"
