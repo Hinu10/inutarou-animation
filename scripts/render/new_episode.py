@@ -1,5 +1,6 @@
 """Create an episode cut-sheet skeleton without copying character assets."""
 import argparse
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,10 +17,11 @@ def main() -> None:
     if folder.exists():
         ap.error(f"already exists: {folder}")
     (folder / "shots").mkdir(parents=True)
+    title = json.dumps(args.title, ensure_ascii=False)
     (folder / "cuts.toml").write_text(
         f'''[episode]
 id = "{args.episode}"
-title = "{args.title}"
+title = {title}
 fps = 24
 width = 1920
 height = 1080

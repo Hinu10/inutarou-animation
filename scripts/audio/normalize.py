@@ -1,6 +1,7 @@
 """Normalize a cut-sheet mix to a provisional integrated loudness target."""
 import argparse
 import json
+import math
 import re
 import subprocess
 from pathlib import Path
@@ -30,10 +31,15 @@ def main() -> None:
     if not blocks:
         raise RuntimeError("ffmpeg loudnorm did not report measurements")
     values = json.loads(blocks[-1])
-    measured = (f":measured_I={values['input_i']}:measured_TP={values['input_tp']}"
-                f":measured_LRA={values['input_lra']}:measured_thresh={values['input_thresh']}"
-                f":offset={values['target_offset']}:linear=true")
-    subprocess.run(cmd + ["-filter_complex", f"{source_filter},loudnorm={target}{measured}[out]",
+    if math.isfinite(float(values["input_i"])) and math.isfinite(float(values["target_offset"])):
+        measured = (f":measured_I={values['input_i']}:measured_TP={values['input_tp']}"
+                    f":measured_LRA={values['input_lra']}:measured_thresh={values['input_thresh']}"
+                    f":offset={values['target_offset']}:linear=true")
+        output_filter = f"{source_filter},loudnorm={target}{measured}[out]"
+    else:
+        # A silent episode has no integrated loudness to normalize.
+        output_filter = f"{source_filter}[out]"
+    subprocess.run(cmd + ["-filter_complex", output_filter,
                           "-map", "[out]", "-ar", "48000", "-ac", "2", str(args.output)],
                    check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print("wrote", args.output)

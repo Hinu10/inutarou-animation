@@ -140,7 +140,7 @@ def main() -> None:
     elif args.mode == "shot":
         if not args.id:
             ap.error("shot id required")
-        print(render_shot(args.episode, args.id))
+        print(render_shot(args.episode, args.id, args.percent))
     else:
         print(render_episode(args.episode, args.id if args.mode == "cut" else None,
                              args.percent, args.bgm))

@@ -2,6 +2,7 @@
 import array
 import importlib.util
 import sys
+import tomllib
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -19,9 +20,22 @@ def module(name, path):
 
 qc = module("qc", "scripts/qc/check_output.py")
 lip = module("lip", "scripts/audio/lip_sync.py")
+template = module("template", "scripts/render/new_episode.py")
 
 
 class MediaToolsTest(unittest.TestCase):
+    def test_new_episode_template_handles_quoted_title(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.object(template, "ROOT", Path(folder)), patch.object(
+                sys, "argv", ["new_episode.py", "episode02", "--title", '犬太朗 "新章"']
+            ):
+                template.main()
+            sheet = Path(folder) / "scenes/episode02/cuts.toml"
+            raw = tomllib.loads(sheet.read_text(encoding="utf-8"))
+            self.assertEqual(raw["episode"]["title"], '犬太朗 "新章"')
+            self.assertEqual(raw["cut"][0]["status"], "todo")
+
     def test_render_duration_mismatch_is_rejected(self):
         ep = qc.timeline.load("episode01")
         shot = "s6_ending"
