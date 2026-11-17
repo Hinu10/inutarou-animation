@@ -1,6 +1,7 @@
 """Media calculations tested without ffmpeg or Blender."""
 import array
 import importlib.util
+import json
 import sys
 import tomllib
 import unittest
@@ -72,6 +73,33 @@ class MediaToolsTest(unittest.TestCase):
         keys = lip.mouth_frames(data, 24, 1, 3, 0.03)
         self.assertEqual(keys[0], {"frame": 1, "state": "closed"})
         self.assertIn({"frame": 2, "state": "open"}, keys)
+
+    def test_lip_sync_reports_audio_end_and_cut_truncation(self):
+        import tempfile
+        cue = lip.timeline.Cue("line", 2, "c1", speaker="kaito",
+                               audio="assets/audio/line.wav")
+        cut = lip.timeline.Cut("c1", 1, 1, 3, cues=[cue])
+        episode = lip.timeline.Episode("episode02", "test", 24, 1920, 1080, [cut])
+        with tempfile.TemporaryDirectory() as folder:
+            out = Path(folder) / "lip_sync.json"
+            with patch.object(lip.timeline, "load", return_value=episode), patch.object(
+                lip, "samples", return_value=array.array("h", [16000] * 10000)
+            ), patch.object(sys, "argv", ["lip_sync.py", "--episode", "episode02",
+                                         "--out", str(out)]):
+                lip.main()
+            track = json.loads(out.read_text(encoding="utf-8"))["tracks"][0]
+            self.assertEqual(track["end_frame"], 3)
+            self.assertTrue(track["truncated"])
+            self.assertEqual(track["keys"][0], {"frame": 2, "state": "open"})
+
+            with patch.object(lip.timeline, "load", return_value=episode), patch.object(
+                lip, "samples", return_value=array.array("h", [16000] * 2000)
+            ), patch.object(sys, "argv", ["lip_sync.py", "--episode", "episode02",
+                                         "--out", str(out)]):
+                lip.main()
+            track = json.loads(out.read_text(encoding="utf-8"))["tracks"][0]
+            self.assertEqual(track["end_frame"], 2)
+            self.assertFalse(track["truncated"])
 
 
 if __name__ == "__main__":
