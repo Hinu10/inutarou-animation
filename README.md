@@ -145,7 +145,7 @@ python3 scripts/qc/check_output.py renders/episode01/episode01.mp4 --percent 50
 - 仮キャラクターの表情一覧: `Blender -b --factory-startup --python scripts/preview_characters.py -- renders/preview/characters.png`
 - 話全体の書き出し・結合・検査は `render_episode.py` と `check_output.py` が行う（#49〜#51）。
 
-`render_episode.py` はカット単位・話全体を出力する。未実装のカットはカット ID 付きの黒い仮画面にする。検査スクリプトは画面サイズ、24fps、尺、H.264/AAC と黒画面・無音区間を確認する。演出上の黒画面や無音は `--allow-black` / `--allow-silence` を指定する。書き出しコマンド内の検査は構造と尺だけを確認する。音量目標は暫定の -24 LUFS で、正式な納品基準はオーナーが決める。
+`render_episode.py` はカット単位・話全体を出力する。未実装のカットはカット ID 付きの黒い仮画面にする。検査スクリプトは画面サイズ、24fps、尺、H.264/AAC と黒画面・無音区間を確認する。演出上の黒画面や無音は `--allow-black` / `--allow-silence` を指定する。正式版の検査では `--require-final` を付け、`status = "temp"` / `"todo"` のカットを失敗扱いにする。書き出しコマンド内の検査は構造と尺だけを確認する。音量目標は暫定の -24 LUFS で、正式な納品基準はオーナーが決める。
 
 新しい話のひな形は `python3 scripts/render/new_episode.py episode02 --title "話のタイトル"` で作る。
 

@@ -55,6 +55,18 @@ class MediaToolsTest(unittest.TestCase):
             errors = qc.check(Path("fake.mp4"), ep, shot, scan=False)
         self.assertTrue(any("frames:" in error for error in errors))
 
+    def test_preview_cannot_pass_final_gate(self):
+        ep = qc.timeline.load("episode01")
+        expected = ep.frames
+        info = {"streams": [
+            {"codec_type": "video", "codec_name": "h264", "width": 1920, "height": 1080,
+             "avg_frame_rate": "24/1", "nb_frames": str(expected)},
+            {"codec_type": "audio", "codec_name": "aac"}],
+            "format": {"duration": str(expected / 24)}}
+        with patch.object(qc, "probe", return_value=info):
+            errors = qc.check(Path("preview.mp4"), ep, None, scan=False, require_final=True)
+        self.assertTrue(any("non-final cuts" in error for error in errors))
+
     def test_mouth_keys_follow_audio_energy(self):
         data = array.array("h", [0] * 2000 + [16000] * 2000 + [0] * 2000)
         keys = lip.mouth_frames(data, 24, 1, 3, 0.03)

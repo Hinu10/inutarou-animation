@@ -23,7 +23,7 @@ def probe(path: Path) -> dict:
 def detect(path: Path, filter_name: str) -> str:
     p = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(path),
                         "-vf" if filter_name == "blackdetect" else "-af",
-                        "blackdetect=d=0.2:pix_th=0.10" if filter_name == "blackdetect"
+                        "blackdetect=d=0:pix_th=0.10" if filter_name == "blackdetect"
                         else "silencedetect=noise=-50dB:d=0.5", "-f", "null", "-"],
                        capture_output=True, text=True)
     if p.returncode:
@@ -33,11 +33,15 @@ def detect(path: Path, filter_name: str) -> str:
 
 def check(path: Path, ep: timeline.Episode, shot: str | None, *, cut_id: str | None = None,
           allow_black: bool = False, allow_silence: bool = False,
-          percent: int = 100, scan: bool = True) -> list[str]:
+          percent: int = 100, scan: bool = True, require_final: bool = False) -> list[str]:
     errors: list[str] = []
     cuts = [ep.cut(cut_id)] if cut_id else ep.cuts_of_shot(shot) if shot else ep.cuts
     if not cuts:
         return [f"unknown shot: {shot}"]
+    if require_final:
+        unfinished = [c.id for c in cuts if c.data.get("status") != "final"]
+        if unfinished:
+            errors.append(f"non-final cuts: {unfinished}")
     expected = sum(c.frames for c in cuts)
     info = probe(path)
     video = next((s for s in info["streams"] if s["codec_type"] == "video"), None)
@@ -86,11 +90,13 @@ def main() -> int:
     ap.add_argument("--allow-black", action="store_true", help="intentional placeholder/black screen")
     ap.add_argument("--allow-silence", action="store_true", help="intentional silent passage")
     ap.add_argument("--no-scan", action="store_true", help="skip black/silence scan")
+    ap.add_argument("--require-final", action="store_true", help="reject temp/todo cuts")
     args = ap.parse_args()
     try:
         errors = check(args.file, timeline.load(args.episode), args.shot, cut_id=args.cut,
                        allow_black=args.allow_black, allow_silence=args.allow_silence,
-                       percent=args.percent, scan=not args.no_scan)
+                       percent=args.percent, scan=not args.no_scan,
+                       require_final=args.require_final)
     except (OSError, subprocess.CalledProcessError, ValueError, RuntimeError) as e:
         errors = [str(e)]
     for error in errors:
