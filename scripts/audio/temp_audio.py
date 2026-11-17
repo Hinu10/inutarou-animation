@@ -117,12 +117,14 @@ def read_wav(path: Path) -> list[float]:
                         "-sample_fmt", "s16", str(tmp)], check=True)
         with wave.open(str(tmp)) as w:
             data = array.array("h", w.readframes(w.getnframes()))
+    if not data:
+        raise ValueError(f"音声が空です: {path}")
     return [s / 32768 for s in data]
 
 
 def say(text: str, voice: str, rate: int) -> list[float]:
     if not shutil.which("say"):
-        return []
+        raise RuntimeError("仮音声の生成には macOS の say が必要です。正式音声を audio に指定することもできます。")
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td) / "v.wav"
         cmd = ["say", "-o", str(tmp), f"--data-format=LEI16@{SR}"]
@@ -172,20 +174,30 @@ def main() -> None:
         elif q.name in SFX:
             src, kind = SFX[q.name](), "temp_synth"
         else:
-            src, kind = [], "missing"
+            raise ValueError(f"効果音が見つかりません: {q.cut} {q.name}")
         off = round((q.frame - start) / ep.fps * SR)
         for i, v in enumerate(src):
             if 0 <= off + i < n:
                 mix[off + i] += v * q.gain
+        cut = ep.cut(q.cut)
+        available_cut_samples = round((cut.end - q.frame + 1) / ep.fps * SR)
+        over_cut = max(0, len(src) - available_cut_samples) / SR
+        truncated = max(0, off + len(src) - n) / SR
         report.append({"frame": q.frame, "shot_frame": q.frame - start + 1, "cut": q.cut,
                        "kind": q.kind, "name": q.name or q.speaker, "text": q.text, "source": kind,
-                       "seconds": round(len(src) / SR, 3)})
+                       "seconds": round(len(src) / SR, 3),
+                       "over_cut_seconds": round(over_cut, 3),
+                       "truncated_seconds": round(truncated, 3)})
     out = Path(args.out)
     write_wav(out, mix)
     out.with_suffix(".cues.json").write_text(json.dumps(report, ensure_ascii=False, indent=2),
                                              encoding="utf-8")
     for r in report:
         print(f"  {r['shot_frame']:>4}f  {r['kind']:<4} {r['name']:<10} {r['source']:<11} {r['text']}")
+        if r["over_cut_seconds"] > 0:
+            print(f"    WARNING: {r['over_cut_seconds']:.3f}s beyond cut {r['cut']}")
+        if r["truncated_seconds"] > 0:
+            print(f"    WARNING: {r['truncated_seconds']:.3f}s truncated at output end")
     print("wrote", out)
 
 

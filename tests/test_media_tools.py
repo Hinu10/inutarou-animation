@@ -21,9 +21,15 @@ def module(name, path):
 qc = module("qc", "scripts/qc/check_output.py")
 lip = module("lip", "scripts/audio/lip_sync.py")
 template = module("template", "scripts/render/new_episode.py")
+temp_audio = module("temp_audio", "scripts/audio/temp_audio.py")
 
 
 class MediaToolsTest(unittest.TestCase):
+    def test_missing_temp_voice_is_an_error(self):
+        with patch.object(temp_audio.shutil, "which", return_value=None):
+            with self.assertRaises(RuntimeError):
+                temp_audio.say("test", "", 200)
+
     def test_new_episode_template_handles_quoted_title(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
