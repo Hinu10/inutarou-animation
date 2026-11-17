@@ -4,7 +4,8 @@
 姿勢の数値はキャラクターの design.py の MOTION（あれば）から読むので、
 正式デザインに差し替えても呼び出し側は変えなくてよい。
 
-  talk(actor, start, frames)                   口パク（仮。音声からの口パクは Codex #46）
+  talk(actor, start, frames)                   口パク（仮。ランダムに開け閉め）
+  talk_keys(actor, keys)                       音声から出した開閉キーで口パク（lipsync.py / #63）
   blink(actor, frames)                         まばたき
   walk(actor, start, end, x0, x1, y)           横移動の歩き（足の振り・上下動・腕振り）
   flap(actor, start, end, path)                羽ばたきながら path に沿って飛ぶ（カラス）
@@ -44,6 +45,24 @@ def talk(actor, start: int, frames: int, open_: Sequence[str] = ("open",),
         k += 1
     actor.rig.swap(end, part, end_variant or closed)
     return end
+
+
+def talk_keys(actor, keys: Sequence[tuple[int, bool]], open_: str = "open",
+              closed: str = "default", end_variant: str | None = None, end: int | None = None,
+              tail: int = 4, part: str = "mouth") -> int:
+    """音声から出した (フレーム, 開いているか) のキーで口を開け閉めする。終わりのコマを返す。
+
+    最後のキーが「開」のまま終わっているときは tail コマ後に閉じる（end を超えない）。
+    """
+    for f, is_open in keys:
+        actor.rig.swap(f, part, open_ if is_open else closed)
+    last, last_open = keys[-1]
+    stop = last
+    if last_open:
+        stop = max(last + 1, min(last + tail, end) if end is not None else last + tail)
+    if last_open or end_variant:
+        actor.rig.swap(stop, part, end_variant or closed)
+    return stop
 
 
 def talk_cue(actor, cue, fps: int = 24, **kw) -> int:

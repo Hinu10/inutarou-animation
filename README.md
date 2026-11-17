@@ -149,7 +149,7 @@ python3 scripts/qc/check_output.py renders/episode01/episode01.mp4 --percent 50
 
 新しい話のひな形は `python3 scripts/render/new_episode.py episode02 --title "話のタイトル"` で作る。
 
-正式音声を `[[cut.line]]` / `[[cut.sfx]]` の `audio` に指定すると、カット表のタイミングでミックスする。仮ナレーションの聞こえ方は `python3 scripts/audio/temp_audio.py --episode episode01 --narration-rate 360 --out renders/episode01/narration_test.wav` のように速度を変えて比較する。収録音声が入った後は `python3 scripts/audio/lip_sync.py --episode episode01 --out renders/episode01/lip_sync.json` で口の開閉タイミングを出力する。現在のアニメーション側はこの JSON をまだ読み込まない。
+正式音声を `[[cut.line]]` / `[[cut.sfx]]` の `audio` に指定すると、カット表のタイミングでミックスする。仮ナレーションの聞こえ方は `python3 scripts/audio/temp_audio.py --episode episode01 --narration-rate 360 --out renders/episode01/narration_test.wav` のように速度を変えて比較する。収録音声が入った後は `python3 scripts/audio/lip_sync.py --episode episode01 --out renders/episode01/lip_sync.json` で口の開閉タイミングを出力する。ショットを書き出すと、この JSON に同じカット・話者・`audio` のセリフがあれば口パクがその開閉タイミングになる（無ければ仮の口パク。#63）。
 
 ## 大きいファイルの扱い
 
