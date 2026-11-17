@@ -23,6 +23,8 @@ def samples(path: Path) -> array.array:
                         "-ac", "1", "-ar", str(SR), "-"], check=True, capture_output=True)
     data = array.array("h")
     data.frombytes(p.stdout)
+    if not data:
+        raise ValueError(f"音声が空です: {path}")
     return data
 
 
@@ -56,11 +58,13 @@ def main() -> None:
                 continue
             source = ROOT / cue.audio
             data = samples(source)
-            last = min(cut.end, cue.frame + math.ceil(len(data) / SR * ep.fps) - 1)
+            audio_end = cue.frame + (len(data) * ep.fps + SR - 1) // SR - 1
+            last = min(cut.end, audio_end)
             keys = mouth_frames(data, ep.fps, cue.frame, last, args.threshold)
             result.append({"cut": cut.id, "speaker": cue.speaker, "source": cue.audio,
                            "part": "mouth", "open_variant": OPEN[cue.speaker],
-                           "closed_variant": "default", "keys": keys})
+                           "closed_variant": "default", "end_frame": last,
+                           "truncated": audio_end > cut.end, "keys": keys})
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({"episode": ep.id, "fps": ep.fps, "tracks": result},
                                    ensure_ascii=False, indent=2), encoding="utf-8")
