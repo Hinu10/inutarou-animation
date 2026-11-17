@@ -54,7 +54,7 @@ def check(path: Path, ep: timeline.Episode, shot: str | None, *, cut_id: str | N
     if audio is None or audio.get("codec_name") != "aac":
         errors.append(f"audio codec: {audio.get('codec_name') if audio else 'missing'}")
     frames = int(video.get("nb_frames") or round(float(video.get("duration") or info["format"]["duration"]) * ep.fps))
-    if abs(frames - expected) > 1:
+    if frames != expected:
         errors.append(f"frames: expected {expected}, got {frames}")
     duration = float(info["format"]["duration"])
     if abs(duration - expected / ep.fps) > 1 / ep.fps + 0.03:
@@ -65,9 +65,14 @@ def check(path: Path, ep: timeline.Episode, shot: str | None, *, cut_id: str | N
             if black:
                 errors.append(f"black intervals: {black}")
         if audio and not allow_silence:
-            silence = re.findall(r"silence_start: ([\d.]+)", detect(path, "silencedetect"))
+            report = detect(path, "silencedetect")
+            silence = re.findall(r"silence_start: ([\d.]+).*?silence_end: ([\d.]+)",
+                                 report, re.DOTALL)
+            starts = re.findall(r"silence_start: ([\d.]+)", report)
+            if len(starts) > len(silence):
+                silence.append((starts[-1], f"{duration:.3f}"))
             if silence:
-                errors.append(f"silence starts: {silence}")
+                errors.append(f"silence intervals: {silence}")
     return errors
 
 

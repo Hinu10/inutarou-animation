@@ -42,9 +42,9 @@ class MediaToolsTest(unittest.TestCase):
         expected = sum(c.frames for c in ep.cuts_of_shot(shot))
         info = {"streams": [
             {"codec_type": "video", "codec_name": "h264", "width": 1920, "height": 1080,
-             "avg_frame_rate": "24/1", "nb_frames": str(expected - 10)},
+             "avg_frame_rate": "24/1", "nb_frames": str(expected - 1)},
             {"codec_type": "audio", "codec_name": "aac"}],
-            "format": {"duration": str((expected - 10) / 24)}}
+            "format": {"duration": str((expected - 1) / 24)}}
         with patch.object(qc, "probe", return_value=info):
             errors = qc.check(Path("fake.mp4"), ep, shot, scan=False)
         self.assertTrue(any("frames:" in error for error in errors))
